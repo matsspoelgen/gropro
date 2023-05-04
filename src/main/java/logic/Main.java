@@ -31,13 +31,14 @@ public class Main {
         Logger logger = Logger.getInstance();
         logger.start("main");
 
-        String inputFileName = "../Test/Input/file.txt";
+        String inputFileName = ".test/input/file.txt";
         String outputFileName = ConstantsFileHandling.OUTPUT_PATH
                 + new File(inputFileName).getName()
                 + ConstantsFileHandling.OUTPUT_EXTENSION;
 
         InputHandler reader = new FileReader(inputFileName);
         OutputHandler writer = new FileWriter(outputFileName);
+        writer.write();
 
         logger.stop("main");
     }

@@ -19,7 +19,7 @@ public class ConstantsFileHandling {
     /**
      * Pfad fuer die Ausgabe von Dateien
      */
-    public final static String OUTPUT_PATH = "../Test/Output/";
+    public final static String OUTPUT_PATH = ".test/output/";
 
     /**
      * Praefix und Erkennungsmerkmal einer Kommentarzeile
