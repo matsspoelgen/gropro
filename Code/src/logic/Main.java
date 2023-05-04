@@ -28,6 +28,9 @@ public class Main {
 //        }
 //
 //        String inputFileName = args[0];
+        Logger logger = Logger.getInstance();
+        logger.start("main");
+
         String inputFileName = "../Test/Input/file.txt";
         String outputFileName = ConstantsFileHandling.OUTPUT_PATH
                 + new File(inputFileName).getName()
@@ -35,7 +38,8 @@ public class Main {
 
         InputHandler reader = new FileReader(inputFileName);
         OutputHandler writer = new FileWriter(outputFileName);
-        writer.write();
+
+        logger.stop("main");
     }
 
 }
