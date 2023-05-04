@@ -5,6 +5,6 @@ package model;
  *
  * @author Mats Spoelgen
  */
-public class Constants {
+public final class Constants {
 
 }

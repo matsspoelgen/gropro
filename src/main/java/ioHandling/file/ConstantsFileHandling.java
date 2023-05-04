@@ -5,7 +5,7 @@ package ioHandling.file;
  *
  * @author Mats Spoelgen
  */
-public class ConstantsFileHandling {
+public final class ConstantsFileHandling {
     /**
      * Dateiendung fuer Eingabedateien
      */
