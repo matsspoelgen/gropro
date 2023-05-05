@@ -6,10 +6,11 @@ package ioHandling.file;
  * @author Mats Spoelgen
  */
 public final class ConstantsFileHandling {
+
     /**
-     * Dateiendung fuer Eingabedateien
+     * Dateiendung fuer Fehlerdateien
      */
-    public final static String INPUT_EXTENSION = ".in";
+    public final static String ERROR_EXTENSION = ".err";
 
     /**
      * Dateiendung fuer Ausgabedateien
@@ -19,7 +20,7 @@ public final class ConstantsFileHandling {
     /**
      * Pfad fuer die Ausgabe von Dateien
      */
-    public final static String OUTPUT_PATH = ".test/output/";
+    public final static String OUTPUT_PATH = "output/";
 
     /**
      * Praefix und Erkennungsmerkmal einer Kommentarzeile

@@ -1,5 +1,7 @@
 package ioHandling;
 
+import java.util.ArrayList;
+
 /**
  * Abstrakte Klasse zur Generalisierung eines Input-Handlers, der die Eingabe für den Algorithmus vorbereitet.
  * Mit dieser können verschiedene Handler implementiert werden, die
@@ -13,11 +15,5 @@ public abstract class InputHandler {
      * Gibt die vorbereiteten Daten aus.
      * @return vorbereitete Daten
      */
-    public abstract String getData();
-
-    /**
-     * Liest und verarbeitet den Input.
-     * @throws Exception
-     */
-    public abstract void read() throws Exception;
+    public abstract ArrayList<Integer> getData();
 }

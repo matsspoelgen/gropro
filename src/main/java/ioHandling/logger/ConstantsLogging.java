@@ -1,4 +1,4 @@
-package logging;
+package ioHandling.logger;
 
 /**
  * Dient zur Bereitstellung von Variablen fuer Logging, die hier zentral Verwaltet werden koennen.

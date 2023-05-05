@@ -5,6 +5,12 @@ package ioHandling.file.exceptions;
  * @author Mats Spoelgen
  */
 public class FileFormatException extends Exception{
+
+    /**
+     * Konstruktor
+     *
+     * @param message Nachricht
+     */
     public FileFormatException(String message) {
         super(message);
     }

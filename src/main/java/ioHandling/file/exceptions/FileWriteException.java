@@ -5,6 +5,12 @@ package ioHandling.file.exceptions;
  * @author Mats Spoelgen
  */
 public class FileWriteException extends Exception {
+
+    /**
+     * Konstruktor
+     *
+     * @param message Nachricht
+     */
     public FileWriteException(String message) {
         super(message);
     }

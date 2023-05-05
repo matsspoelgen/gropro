@@ -14,19 +14,21 @@ import java.util.Scanner;
  *
  * @author Mats Spoelgen
  */
-public class FileReader extends InputHandler {
+public class FileInput extends InputHandler {
 
     private final File file;
-    private String data;
+    private final ArrayList<Integer> data;
 
     /**
      * Erstellt einen neuen FileReader. Der Pfad der Eingabedatei wird uebergeben.
      * @param filePath Pfad der Eingabedatei
      * @throws FileNotFoundException falls die Datei nicht gefunden werden kann.
      * @throws FileReadException falls ein Fehler beim Lesen der Datei auftritt.
+     * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
      */
-    public FileReader(String filePath) throws FileNotFoundException, FileReadException {
+    public FileInput(String filePath) throws FileNotFoundException, FileReadException, FileFormatException {
         this.file = new File(filePath);
+        this.data = new ArrayList<>();
 
         if(!this.file.isFile()) {
             throw new FileNotFoundException(String.format("\"%s\" ist keine Datei oder wurde nicht gefunden.", this.file.getName()));
@@ -35,6 +37,8 @@ public class FileReader extends InputHandler {
         if(!this.file.canRead()) {
             throw new FileReadException(String.format("Die Datei \"%s\" kann nicht gelesen werden.", this.file.getName()));
         }
+
+        this.read();
     }
 
     /**
@@ -42,8 +46,7 @@ public class FileReader extends InputHandler {
      * @throws FileNotFoundException falls ein Fehler beim Zugriff auf die Datei auftritt.
      * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
      */
-    @Override
-    public void read() throws FileNotFoundException, FileFormatException {
+    private void read() throws FileNotFoundException, FileFormatException {
         Scanner scanner = new Scanner(this.file);
 
         if(!scanner.hasNext()) {
@@ -62,12 +65,13 @@ public class FileReader extends InputHandler {
             }
         } while (scanner.hasNext());
 
-        this.data = "";
+        this.data.add(5);
+
         scanner.close();
     }
 
     @Override
-    public String getData(){
+    public ArrayList<Integer> getData(){
         return this.data;
     }
 }
