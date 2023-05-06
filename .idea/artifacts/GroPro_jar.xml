@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="GroPro:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/GroPro_jar</output-path>
+  <artifact type="jar" build-on-make="true" name="GroPro:jar">
+    <output-path>$PROJECT_DIR$/jar</output-path>
     <root id="archive" name="GroPro.jar">
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />

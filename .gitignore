@@ -40,7 +40,7 @@ build/
 
 .test/
 .javadoc/
-out/
+jar/
 input/
 output/
 META-INF/

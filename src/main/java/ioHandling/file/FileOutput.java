@@ -47,7 +47,7 @@ public class FileOutput implements OutputHandler {
     private File getFile(String filePath) throws FileCreateException, FileWriteException {
         File file = new File(filePath);
         try {
-            if (new File(file.getParent()).mkdirs()) {
+            if (file.getParentFile().mkdirs()) {
                 logger.log(String.format("Verzeichnis \"%s\" erstellt", file.getParent()));
             }
             if (file.createNewFile()) {
