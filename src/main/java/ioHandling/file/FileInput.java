@@ -14,7 +14,7 @@ import java.util.Scanner;
  *
  * @author Mats Spoelgen
  */
-public class FileInput extends InputHandler {
+public class FileInput implements InputHandler {
 
     private final File file;
     private final ArrayList<Integer> data;
@@ -53,7 +53,7 @@ public class FileInput extends InputHandler {
             throw new FileFormatException("Die Datei ist leer und damit ungueltig.");
         }
 
-        ArrayList<String> inputLines = new ArrayList<String>();
+        ArrayList<String> inputLines = new ArrayList<>();
         String line;
 
         do {

@@ -18,13 +18,13 @@ public class Logger {
     /**
      * Liste aller geloggten Nachrichten seit Start des Programms
      */
-    private ArrayList<String> messages = new ArrayList<>();
+    private final ArrayList<String> messages = new ArrayList<>();
 
     /**
      * Map aller laufenden Events. Schluessel ist Name des Events,
      * Wert ist Startzeitpunkt in Millisekunden
      */
-    private HashMap<String, Long> events = new HashMap<>();
+    private final HashMap<String, Long> events = new HashMap<>();
 
     /**
      * Merkt sich, ob waehrend der Verarbeitung Fehler aufgetreten sind.

@@ -3,13 +3,13 @@ package ioHandling;
 import java.util.ArrayList;
 
 /**
- * Abstrakte Klasse zur Generalisierung eines Output-Handlers, der das Ergebnis des Algorithmus weitergibt.
+ * Interface zur Generalisierung eines Output-Handlers, der das Ergebnis des Algorithmus weitergibt.
  * Mit dieser koennen verschiedene Handler implementiert werden, die
  * beispielsweise die Konsole, eine Datei oder eine Verbindung als Output nutzen.
  *
  * @author Mats Spoelgen
  */
-public abstract class OutputHandler {
+public interface OutputHandler {
 
     /**
      * Schreibt das Ergebnis bei erfolgreicher ausfuehrung des Algorithmus in den Output.

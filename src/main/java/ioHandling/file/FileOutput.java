@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @author Mats Spoelgen
  */
-public class FileOutput extends OutputHandler {
+public class FileOutput implements OutputHandler {
 
     private final File file;
     private final String errorFilePath;
