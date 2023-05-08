@@ -3,11 +3,11 @@ package ioHandling.file;
 import ioHandling.file.exceptions.FileFormatException;
 import ioHandling.file.exceptions.FileReadException;
 import ioHandling.InputHandler;
+import model.Zugverbindung;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Spezialisierung eines InputHandlers, die eine Datei als Input nutzt.
@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class FileInput implements InputHandler {
 
     private final File file;
-    private final ArrayList<Integer> data;
+    private ArrayList<Zugverbindung> verbindungen;
 
     /**
      * Erstellt einen neuen FileReader. Der Pfad der Eingabedatei wird uebergeben.
@@ -28,7 +28,7 @@ public class FileInput implements InputHandler {
      */
     public FileInput(String filePath) throws FileNotFoundException, FileReadException, FileFormatException {
         this.file = new File(filePath);
-        this.data = new ArrayList<>();
+        this.verbindungen = new ArrayList<>();
 
         if(!this.file.isFile()) {
             throw new FileNotFoundException(String.format("\"%s\" ist keine Datei oder wurde nicht gefunden.", this.file.getName()));
@@ -42,7 +42,7 @@ public class FileInput implements InputHandler {
     }
 
     /**
-     * Liest die Eingabedaten aus der Datei und bereitet diese fuer den Algorithmus vor.
+     * Liest die Eingabedatei ein und speichert die Zugverbindungen ab.
      * @throws FileNotFoundException falls ein Fehler beim Zugriff auf die Datei auftritt.
      * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
      */
@@ -53,25 +53,27 @@ public class FileInput implements InputHandler {
             throw new FileFormatException("Die Datei ist leer und damit ungueltig.");
         }
 
-        ArrayList<String> inputLines = new ArrayList<>();
         String line;
-
         do {
             line = scanner.nextLine();
-            if(line.startsWith(ConstantsFileHandling.COMMENT_PREFIX)) {
-                // line is comment
-            } else {
-                // standard
+            if(!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
+                Zugverbindung verbindung = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
+                if(verbindung.getStationen().size() < 2) {
+                    throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen");
+                }
+                this.verbindungen.add(verbindung);
             }
         } while (scanner.hasNext());
 
-        this.data.add(5);
+        if(this.verbindungen.size() == 0){
+            throw new FileFormatException("Die Datei enthaelt keine gueltigen Verbindungen");
+        }
 
         scanner.close();
     }
 
     @Override
-    public ArrayList<Integer> getData(){
-        return this.data;
+    public ArrayList<Zugverbindung> getData(){
+        return this.verbindungen;
     }
 }

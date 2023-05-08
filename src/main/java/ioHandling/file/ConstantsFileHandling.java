@@ -25,5 +25,16 @@ public final class ConstantsFileHandling {
     /**
      * Praefix und Erkennungsmerkmal einer Kommentarzeile
      */
-    public final static String COMMENT_PREFIX = "%";
+    public final static String COMMENT_PREFIX = "#";
+
+    /**
+     * Regulaerer Ausdruck, der testet, ob eine Eingabezeile ausschließlich
+     * aus mindestens 2 Buchstabenfolgen, getrennt durch Semikolons besteht.
+     */
+    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z]+;)+[a-zA-Z]*$";
+
+    /**
+     * Regulaerer Ausdruck, Trennsymbol der Stationen in der Eingabedatei.
+     */
+    public final static String STATION_SEPARATOR = ";";
 }

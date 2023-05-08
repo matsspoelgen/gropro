@@ -1,5 +1,7 @@
 package ioHandling;
 
+import model.Zugverbindung;
+
 import java.util.ArrayList;
 
 /**
@@ -13,7 +15,8 @@ public interface InputHandler {
 
     /**
      * Gibt die vorbereiteten Daten aus.
+     *
      * @return vorbereitete Daten
      */
-    public abstract ArrayList<Integer> getData();
+    public abstract ArrayList<Zugverbindung> getData();
 }

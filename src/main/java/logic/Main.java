@@ -13,6 +13,7 @@ import ioHandling.logger.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 /**
  * Startklasse des Programms TODO thema
@@ -32,7 +33,7 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputPath = args[0];
-        inputFilePath = "input/file.txt";
+        inputFilePath = "input/Datenreduktion2.txt";
 //        logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true);
     }
@@ -79,15 +80,8 @@ public class Main {
         try {
 
             // Algorithmus ausfuehren
-
-
-
-            DamenProblem dp = new DamenProblem();
-            for (int n : input.getData()) {
-                dp.solveProblem(n);
-            }
-
-
+            Streckennetz netz = new Streckennetz(input.getData());
+            System.out.println(netz.getMinStationen());
 
             result = "test";
         } catch (Exception e) {
