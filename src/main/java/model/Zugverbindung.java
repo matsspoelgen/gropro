@@ -1,23 +1,21 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
 public class Zugverbindung {
-    private HashSet<String> stationen;
+    private final HashSet<String> stationen;
     public Zugverbindung(String[] stationen) {
         this.stationen = new HashSet<>(Arrays.asList(stationen));
     }
 
-    public HashSet<String> getStationen() {
+    public HashSet<String> getStations() {
         return this.stationen;
     }
 
-    public void removeStations(ArrayList<String> stations) {
-        stations.forEach(this.stationen::remove);
+    public void removeStation(String station) {
+        this.stationen.remove(station);
     }
-
 
     public String toString() {
         return stationen.toString();

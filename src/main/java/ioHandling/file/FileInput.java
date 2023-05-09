@@ -3,6 +3,7 @@ package ioHandling.file;
 import ioHandling.file.exceptions.FileFormatException;
 import ioHandling.file.exceptions.FileReadException;
 import ioHandling.InputHandler;
+import ioHandling.logger.Logger;
 import model.Zugverbindung;
 
 import java.io.File;
@@ -18,6 +19,7 @@ public class FileInput implements InputHandler {
 
     private final File file;
     private ArrayList<Zugverbindung> verbindungen;
+    private final Logger logger;
 
     /**
      * Erstellt einen neuen FileReader. Der Pfad der Eingabedatei wird uebergeben.
@@ -27,6 +29,7 @@ public class FileInput implements InputHandler {
      * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
      */
     public FileInput(String filePath) throws FileNotFoundException, FileReadException, FileFormatException {
+        this.logger = Logger.getInstance();
         this.file = new File(filePath);
         this.verbindungen = new ArrayList<>();
 
@@ -48,6 +51,7 @@ public class FileInput implements InputHandler {
      */
     private void read() throws FileNotFoundException, FileFormatException {
         Scanner scanner = new Scanner(this.file);
+        logger.log("Einlesevorgang gestartet");
 
         if(!scanner.hasNext()) {
             throw new FileFormatException("Die Datei ist leer und damit ungueltig.");
@@ -58,7 +62,7 @@ public class FileInput implements InputHandler {
             line = scanner.nextLine();
             if(!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
                 Zugverbindung verbindung = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
-                if(verbindung.getStationen().size() < 2) {
+                if(verbindung.getStations().size() < 2) {
                     throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen");
                 }
                 this.verbindungen.add(verbindung);
@@ -70,6 +74,7 @@ public class FileInput implements InputHandler {
         }
 
         scanner.close();
+        logger.log(String.format("Einlesevorgang abgeschlossen, %s Zugverbindung(en) eingelesen", this.verbindungen.size()));
     }
 
     @Override

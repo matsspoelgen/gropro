@@ -9,11 +9,12 @@ import ioHandling.file.exceptions.FileCreateException;
 import ioHandling.file.exceptions.FileFormatException;
 import ioHandling.file.exceptions.FileReadException;
 import ioHandling.file.exceptions.FileWriteException;
+import ioHandling.logger.ConstantsLogging;
 import ioHandling.logger.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Startklasse des Programms TODO thema
@@ -32,9 +33,9 @@ public class Main {
 //        if (args == null || args.length == 0) {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
-//        inputPath = args[0];
-        inputFilePath = "input/Datenreduktion2.txt";
-//        logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
+//        inputFilePath = args[0];
+        inputFilePath = "input/random_60_100.txt";
+        logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true);
     }
 
@@ -48,14 +49,13 @@ public class Main {
         output = new FileOutput(outPutFilePath, errorFilePath);
     }
 
-    private static void outputResult(String result) {
+    private static void outputResult(HashSet<String> serviceStationen) {
         try {
             if (logger.hasErrors()) {
                 System.out.println("Bei der Verarbeitung sind Fehler aufgetreten.");
                 output.error(logger.getMessages());
-                System.out.printf("Der Log wurde in eine Fehlerdatei geschrieben: %s%n", new File(errorFilePath).getAbsolutePath());
             } else {
-                output.write(result);
+                output.write(serviceStationen);
                 System.out.println("Verarbeitung erfolgreich.");
             }
         } catch (Exception e) {
@@ -72,23 +72,25 @@ public class Main {
      * @throws Exception bei Fehlern in den Startparametern oder der IO-Konfiguration
      */
     public static void main(String[] args) throws Exception {
+        logger.start(ConstantsLogging.MAIN);
+
         // Fehler werden hier direkt ausgegeben
         parseFileArgs(args);
         initializeFileIO();
 
-        String result = "";
+        HashSet<String> serivceStationen = new HashSet<>();
+
+        // Algorithmus ausfuehren
+        serivceStationen = new Streckennetz(input.getData()).getMinStations();
+
         try {
 
-            // Algorithmus ausfuehren
-            Streckennetz netz = new Streckennetz(input.getData());
-            System.out.println(netz.getMinStationen());
-
-            result = "test";
         } catch (Exception e) {
             logger.error(e.getMessage());
         } finally {
-            outputResult(result);
+            outputResult(serivceStationen);
         }
+        logger.stop(ConstantsLogging.MAIN);
     }
 }
 

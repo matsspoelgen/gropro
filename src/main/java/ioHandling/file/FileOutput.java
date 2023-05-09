@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Spezialisierung eines OutputHandlers, die eine Datei als Output nutzt.
@@ -26,8 +28,8 @@ public class FileOutput implements OutputHandler {
      *
      * @param filePath      Pfad der Datei, in die das Ergebnis des Algorithmus geschrieben wird
      * @param errorFilePath Pfad der Datei, die im Fall eines Fehlers erstellt wird
-     * @throws FileWriteException    falls es zu einem Fehler beim Schreiben in die Datei kommt
-     * @throws FileCreateException   falls es zu einem Fehler beim Erstellen der Ausgabedatei gibt
+     * @throws FileWriteException  falls es zu einem Fehler beim Schreiben in die Datei kommt
+     * @throws FileCreateException falls es zu einem Fehler beim Erstellen der Ausgabedatei gibt
      */
     public FileOutput(String filePath, String errorFilePath) throws FileWriteException, FileCreateException {
         this.logger = Logger.getInstance();
@@ -42,7 +44,7 @@ public class FileOutput implements OutputHandler {
      * @param filePath Pfad der Datei
      * @return Die (erstellte) Datei
      * @throws FileCreateException falls die Datei bzw. das Verzeichnis nicht erstellt werden konnten.
-     * @throws FileWriteException falls in die Datei nicht geschrieben werden kann.
+     * @throws FileWriteException  falls in die Datei nicht geschrieben werden kann.
      */
     private File getFile(String filePath) throws FileCreateException, FileWriteException {
         File file = new File(filePath);
@@ -68,15 +70,22 @@ public class FileOutput implements OutputHandler {
     }
 
     /**
-     * Schreibt die Ausgabe des Algorithmus in die Ausgabedatei.
+     * Schreibt die Position der Servicestationen in die Ausgabedatei.
      *
      * @throws FileNotFoundException falls ein Fehler beim Zugriff auf die Datei auftritt.
      */
     @Override
-    public void write(String data) throws FileNotFoundException {
+    public void write(HashSet<String> serviceStationen) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(this.file);
-        // write to file
+        Iterator<String> stationen = serviceStationen.iterator();
+        while (stationen.hasNext()) {
+            pw.print(stationen.next());
+            if (stationen.hasNext()) {
+                pw.print(ConstantsFileHandling.STATION_SEPARATOR);
+            }
+        }
         pw.close();
+        System.out.printf("Die Loesung wurde in die Ausgabedatei geschrieben: %s%n", this.file.getAbsolutePath());
     }
 
     /**
@@ -88,10 +97,12 @@ public class FileOutput implements OutputHandler {
      */
     @Override
     public void error(ArrayList<String> messages) throws FileCreateException, FileNotFoundException, FileWriteException {
-        PrintWriter pw = new PrintWriter(getFile(this.errorFilePath));
+        File errorFile = getFile(this.errorFilePath);
+        PrintWriter pw = new PrintWriter(errorFile);
         for (String msg : messages) {
             pw.println(msg);
         }
         pw.close();
+        System.out.printf("Der Log wurde in eine Fehlerdatei geschrieben: %s%n", errorFile.getAbsolutePath());
     }
 }
