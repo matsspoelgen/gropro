@@ -36,7 +36,7 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/random_60_10.txt";
+        inputFilePath = "input/random_60_40.txt";
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true); // TODO remove
     }
@@ -82,11 +82,13 @@ public class Main {
 
         HashSet<String> serivceStationen = new HashSet<>();
 
-        try {
-            // Algorithmus ausfuehren
-            serivceStationen = input.getStreckennetz().getMinStations();
+        // Algorithmus ausfuehren
+        serivceStationen = input.getStreckennetz().getMinStations();
 
-            testResult(serivceStationen, input.getConnections());
+        testResult(serivceStationen, input.getConnections());
+
+        try {
+
         } catch (Exception e) {
             logger.error(e.getMessage());
         } finally {
@@ -101,6 +103,7 @@ public class Main {
                 verbindungen) {
             if (verbindung.getStations().stream().noneMatch(servicestationen::contains)) {
                 unvisited++;
+                System.out.println(verbindung);
             }
         }
         System.out.println("Ergebnis getestet. Unbesuchte Verbindungen: " + unvisited);
