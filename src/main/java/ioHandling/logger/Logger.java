@@ -102,6 +102,7 @@ public class Logger {
     public void start(String event) {
         if (!this.events.containsKey(event)) {
             this.events.put(event, System.currentTimeMillis());
+            log(String.format("Ereignis \"%s\" gestartet", event));
         }
     }
 
@@ -114,9 +115,9 @@ public class Logger {
     public void stop(String event) {
         if (this.events.containsKey(event)) {
             long millis = System.currentTimeMillis() - this.events.get(event);
-            log(String.format("Event \"%s\" took %dms (%fs)", event, millis, millis / 1000.0f));
+            log(String.format("Event \"%s\" wurde nach %dms (%fs) beendet.", event, millis, millis / 1000.0f));
         } else {
-            warn(String.format("Tried to stop event \"%s\" which was never started.", event));
+            warn(String.format("Event \"%s\" konnte nicht gestoppt werden, da es nie gestartet wurde.", event));
         }
     }
 

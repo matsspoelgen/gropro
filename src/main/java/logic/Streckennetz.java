@@ -39,6 +39,8 @@ public class Streckennetz {
     public void reduce() {
         reduceConnections();
 
+        logger.log("Ordne allen Bahnhoefen die reduzierten Verbindungen zu");
+
         // ordne allen Stationen die reduzierten Zugverbindungen zu
         for (int i = 0; i < this.connections.size(); i++) {
             for (String station : this.connections.get(i).getStations()) {
@@ -61,14 +63,16 @@ public class Streckennetz {
 
         reduce();
 
-        ArrayList<Bahnhof> remainingStations = new ArrayList<>(this.stations.values());
+        ArrayList<Bahnhof> sortedStations = new ArrayList<>(this.stations.values());
         HashSet<Integer> remainingConnections = new HashSet<>(IntStream.range(0, this.connections.size()).boxed().toList()); // Indices der Verbindungen in this.connections
 
-        remainingStations.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
+        sortedStations.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
 
-        System.out.printf("Starte Algorithmus mit %d Verbindungen und %d Stationen%n", this.connections.size(), this.stations.size());
+        System.out.printf("Starte rekursiven Algorithmus mit %d Verbindungen und %d Stationen%n", this.connections.size(), this.stations.size());
 
-        getMinStationsRek(new HashSet<>(), serviceStations, remainingStations, remainingConnections);
+        getMinStationsRek(new HashSet<>(), serviceStations, sortedStations, remainingConnections);
+
+        logger.log("Beende Algorithmus. Kuerzeste Loesung gefunden.");
 
         logger.stop(ConstantsLogging.MIN_STATIONS);
         System.out.printf("Ergebnis ermittelt: %d Stationen in %s%n", serviceStations.size(), serviceStations);
@@ -93,7 +97,7 @@ public class Streckennetz {
             newStation.removeConnections(removedConnections);
             ret.add(newStation);
         }
-        ret.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
+        ret.sort(Comparator.comparingInt(a -> -a.getConnectionCount())); //TODO nach vorne in rek?
         return ret;
     }
 
@@ -102,19 +106,19 @@ public class Streckennetz {
      *
      * @param current              aktuelle Menge an Servicestationen
      * @param shortest             bisher bestes Ergebnis, Menge an Servicestationen, die alle Verbindungen abdecken
-     * @param remainingStations    Verbleibende Bahnhoefe, die die unbekannten Verbindungen erreichen
+     * @param sortedStations       Bahnhoefe, absteigend nach Anzahl ausgehender, unbekannter Verbindungen sortiert
      * @param remainingConnections Verbleibende Verbindungen, die von den aktuellen Servicestationen nicht erreicht werden koennen
      */
-    private void getMinStationsRek(HashSet<String> current, HashSet<String> shortest, ArrayList<Bahnhof> remainingStations, HashSet<Integer> remainingConnections) {
+    private void getMinStationsRek(HashSet<String> current, HashSet<String> shortest, ArrayList<Bahnhof> sortedStations, HashSet<Integer> remainingConnections) {
 
         if (remainingConnections.isEmpty()) { // Loesung gefunden
             shortest.clear();
             shortest.addAll(current);
-            logger.log("Zwischenergebnis: " + shortest);
+            logger.log(String.format("Zwischenergebnis: %d Stationen %s", shortest.size(), shortest));
             return;
         }
 
-        for (Bahnhof station : remainingStations) {
+        for (Bahnhof station : sortedStations) {
             String currentName = station.getName();
 
             if (current.contains(station.getName())) {
@@ -135,12 +139,12 @@ public class Streckennetz {
             HashSet<Integer> originalConnections = new HashSet<>(remainingConnections);
             remainingConnections.removeAll(removedConnections);                                 // entferne alle neu bekannten Verbindungen
 
-            ArrayList<Bahnhof> originalStations = new ArrayList<>(remainingStations);
-            remainingStations = copyAndRemoveStations(remainingStations, removedConnections);   // entferne die Verbindungen aus den Stationen und sortiere diese neu
+            ArrayList<Bahnhof> originalStations = new ArrayList<>(sortedStations);
+            sortedStations = copyAndRemoveStations(sortedStations, removedConnections);   // entferne die Verbindungen aus den Stationen und sortiere diese neu
 
             current.add(currentName);
-            getMinStationsRek(current, shortest, remainingStations, remainingConnections);      // naechste Station
-            remainingStations = originalStations;                                               // originalwerte wiederherstellen
+            getMinStationsRek(current, shortest, sortedStations, remainingConnections);      // naechste Station
+            sortedStations = originalStations;                                               // originalwerte wiederherstellen
             remainingConnections = originalConnections;
             current.remove(currentName);
 
@@ -153,6 +157,7 @@ public class Streckennetz {
      * eines anderen Bahnhofs ab, kann letzterer entfernt werden.
      */
     private void reduceStations() {
+        logger.log("Reduziere Bahnhoefe");
         HashSet<String> reducedStations = new HashSet<>();
 
         logger.start(ConstantsLogging.REDUCE_STATIONS);
@@ -187,7 +192,8 @@ public class Streckennetz {
      * Vergleicht die Bahnhoefe aller Verbindungen. Haelt eine Verbindunge an allen Bahnhoefen,
      * an denen auch schon eine weitere Verbindung haelt, kann sie entfernt werden.
      */
-    protected void reduceConnections() {
+    private void reduceConnections() {
+        logger.log("Reduziere Verbindungen");
         List<Zugverbindung> reducedConnections = new ArrayList<>();
         logger.start(ConstantsLogging.REDUCE_CONNECTIONS);
 

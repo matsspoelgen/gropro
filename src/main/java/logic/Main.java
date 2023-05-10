@@ -36,7 +36,10 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/random_60_10.txt";
+        inputFilePath = "input/test1.txt";
+        logger.log("Dateiname eingelesen: " + inputFilePath);
+        logger.log("Logging parameter eingelesen: true");
+        logger.log("Logging in Konsole aktiviert.");
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true); // TODO remove
     }
@@ -47,12 +50,16 @@ public class Main {
         String inputFileName = new File(inputFilePath).getName();
         String outPutFilePath = ConstantsFileHandling.OUTPUT_PATH + inputFileName + ConstantsFileHandling.OUTPUT_EXTENSION;
         errorFilePath = ConstantsFileHandling.OUTPUT_PATH + inputFileName + ConstantsFileHandling.ERROR_EXTENSION;
+
+        logger.log("Erstelle FileInput auf Eingabedatei \"" + inputFilePath + "\"");
+        logger.log("Erstelle FileOutput mit Ausgabepfad \"" + outPutFilePath + "\"");
         input = new FileInput(inputFilePath);
         output = new FileOutput(outPutFilePath, errorFilePath);
     }
 
     private static void outputResult(HashSet<String> serviceStationen) {
         try {
+            output.error(logger.getMessages());
             if (logger.hasErrors()) {
                 System.out.println("Bei der Verarbeitung sind Fehler aufgetreten.");
                 output.error(logger.getMessages());
@@ -96,6 +103,7 @@ public class Main {
     }
 
     private static void testResult(HashSet<String> servicestationen, ArrayList<Zugverbindung> verbindungen) {
+        logger.log("Teste Ergebnis mit urspruenglichen Verbindungen.");
         int unvisited = 0;
         for (Zugverbindung verbindung :
                 verbindungen) {

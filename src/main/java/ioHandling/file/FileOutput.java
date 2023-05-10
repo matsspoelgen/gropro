@@ -76,6 +76,7 @@ public class FileOutput implements OutputHandler {
      */
     @Override
     public void write(HashSet<String> serviceStationen) throws FileNotFoundException {
+        logger.log("Schreibe Servicestationen in Ausgabedatei");
         PrintWriter pw = new PrintWriter(this.file);
         Iterator<String> stationen = serviceStationen.iterator();
         while (stationen.hasNext()) {

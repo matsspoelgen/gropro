@@ -21,6 +21,7 @@ public class FileInput implements InputHandler {
 
     private final File file;
     private final ArrayList<Zugverbindung> connections;
+    private final HashMap<String, Bahnhof> stations;
     private final Logger logger;
 
     /**
@@ -35,6 +36,7 @@ public class FileInput implements InputHandler {
         this.logger = Logger.getInstance();
         this.file = new File(filePath);
         this.connections = new ArrayList<>();
+        this.stations = new HashMap<>();
 
         if (!this.file.isFile()) {
             throw new FileNotFoundException(String.format("\"%s\" ist keine Datei oder wurde nicht gefunden.", this.file.getName()));
@@ -48,7 +50,7 @@ public class FileInput implements InputHandler {
     }
 
     /**
-     * Liest die Eingabedatei ein und speichert die Zugverbindungen ab.
+     * Liest die Eingabedatei ein und speichert die Zugverbindungen und Bahnhoefe ab.
      *
      * @throws FileNotFoundException falls ein Fehler beim Zugriff auf die Datei auftritt.
      * @throws FileFormatException   falls die Datei ein ungueltiges Format hat.
@@ -67,18 +69,29 @@ public class FileInput implements InputHandler {
             if (!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
                 Zugverbindung connection = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
                 if (connection.getStations().size() < 2) {
-                    throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen");
+                    throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen"); //TODO kein error...
                 }
                 this.connections.add(connection);
             }
         } while (scanner.hasNext());
 
+        scanner.close();
+
         if (this.connections.size() == 0) {
             throw new FileFormatException("Die Datei enthaelt keine gueltigen Verbindungen");
         }
 
-        scanner.close();
-        logger.log(String.format("Einlesevorgang abgeschlossen, %s Zugverbindung(en) eingelesen", this.connections.size()));
+        logger.log("Erstelle Bahnhoefe aus Zugverbindungen");
+
+        for (Zugverbindung connection : this.connections) {
+            for (String station : connection.getStations()) {
+                if (!stations.containsKey(station)) {
+                    stations.put(station, new Bahnhof(station));
+                }
+            }
+        }
+
+        System.out.printf("Einlesevorgang abgeschlossen, %d Zugverbindungen und %d Bahnhoefe eingelesen%n", this.connections.size(), this.stations.size());
     }
 
     /**
@@ -88,16 +101,8 @@ public class FileInput implements InputHandler {
      */
     @Override
     public Streckennetz getStreckennetz() {
-        HashMap<String, Bahnhof> stations = new HashMap<>();
-        for (Zugverbindung connection : this.connections) {
-            for (String station : connection.getStations()) {
-                if (!stations.containsKey(station)) {
-                    stations.put(station, new Bahnhof(station));
-                }
-            }
-        }
-
-        return new Streckennetz(new ArrayList<>(this.connections), stations);
+        logger.log("Erstelle neues Streckennetz");
+        return new Streckennetz(new ArrayList<>(this.connections), new HashMap<>(this.stations));
     }
 
     /**
