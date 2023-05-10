@@ -3,8 +3,8 @@ package model;
 import java.util.HashSet;
 
 public class Bahnhof {
-    private HashSet<Integer> connections;
-    private String name;
+    private final HashSet<Integer> connections;
+    private final String name;
 
     public Bahnhof(String name) {
         this.connections = new HashSet<>();
@@ -23,7 +23,19 @@ public class Bahnhof {
         return this.connections;
     }
 
+    public void removeConnections(HashSet<Integer> connections) {
+        this.connections.removeAll(connections);
+    }
+
+    public void addConnections(HashSet<Integer> connections) {
+        this.connections.addAll(connections);
+    }
+
+    public Integer getConnectionCount() {
+        return this.connections.size();
+    }
+
     public String toString() {
-        return this.connections.toString();
+        return this.name + ":" + this.connections.toString();
     }
 }

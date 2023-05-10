@@ -1,5 +1,6 @@
 package ioHandling;
 
+import logic.Streckennetz;
 import model.Zugverbindung;
 
 import java.util.ArrayList;
@@ -14,9 +15,17 @@ import java.util.ArrayList;
 public interface InputHandler {
 
     /**
-     * Gibt die vorbereiteten Daten aus.
+     * Gibt das Streckennetz aus.
      *
-     * @return vorbereitete Daten
+     * @return Streckennetz
      */
-    public abstract ArrayList<Zugverbindung> getData();
+    Streckennetz getStreckennetz();
+
+    /**
+     * Gibt die Verbindungen des urspruenglichen Streckennetzes aus.
+     * Wird fuer das Testen des Ergebnisses verwendet.
+     *
+     * @return Verbindungen des Streckennetzes
+     */
+    ArrayList<Zugverbindung> getConnections();
 }

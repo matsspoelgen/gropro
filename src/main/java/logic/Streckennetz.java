@@ -5,151 +5,111 @@ import ioHandling.logger.Logger;
 import model.Bahnhof;
 import model.Zugverbindung;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Streckennetz {
 
-    private ArrayList<Zugverbindung> connections;
-    private HashMap<String, Bahnhof> stations;
-    private Logger logger;
+    private final ArrayList<Zugverbindung> connections;
+    private final HashMap<String, Bahnhof> stations;
+    private final Logger logger;
 
-    public Streckennetz(ArrayList<Zugverbindung> verbindungen) {
+    public Streckennetz(ArrayList<Zugverbindung> connections, HashMap<String, Bahnhof> stations) {
         this.logger = Logger.getInstance();
-        this.connections = verbindungen;
-        this.stations = getStations();
+        this.connections = connections;
+        this.stations = stations;
     }
 
-    // TODO auslagern in einlesen
-    private HashMap<String, Bahnhof> getStations() {
-        HashMap<String, Bahnhof> stations = new HashMap<>();
-        for (Zugverbindung connection : this.connections) {
-            for (String station : connection.getStations()) {
-                if (!stations.containsKey(station)) {
-                    stations.put(station, new Bahnhof(station));
-                }
+    public void reduce() {
+        reduceConnections();
+
+        // ordne allen Stationen die reduzierten Zugverbindungen zu
+        for (int i = 0; i < this.connections.size(); i++) {
+            for (String station : this.connections.get(i).getStations()) {
+                this.stations.get(station).addConnection(i);
             }
         }
-        return stations;
+
+        reduceStations();
     }
 
     public HashSet<String> getMinStations() {
-        reduceConnections();
-
-        // ordne allen Stationen die reduzierten Zugverbindungen zu
-        for (int i = 0; i < this.connections.size(); i++) {
-            for (String station : this.connections.get(i).getStations()) {
-                this.stations.get(station).addConnection(i);
-            }
-        }
-
-        reduceStations();
-
+        HashSet<String> serviceStations = new HashSet<>();
 
         logger.start(ConstantsLogging.MIN_STATIONS);
 
-        HashSet<String> res = new HashSet<>();
-        List<Zugverbindung> current = new ArrayList<>(connections);  //copy
+        reduce();
 
-        while (current.size() != 0) {
-            Map<String, Long> bahnhofCount = getCount(current);  // wie oft kommt jede Station in allen Verbindungen vor
-            String max = Collections.max(bahnhofCount.entrySet(), Map.Entry.comparingByValue()).getKey(); // meiste Verbindungen
-            res.add(max); // max als erste Servicestation
+        ArrayList<Bahnhof> remainingStations = new ArrayList<>(this.stations.values());
+        HashSet<Integer> remainingConnections = new HashSet<>(IntStream.range(0, this.connections.size()).boxed().toList()); // Indices der Verbindungen in this.connections
 
-            List<Zugverbindung> faulty = testConnectAndReturnFaulty(current, res);
-            if (faulty.size() != 0) {
-                current = faulty;
-            } else {
-                break;
-            }
-        }
+        remainingStations.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
 
-        logger.log(String.format("Minimale Servicestationen ermittelt: %s", res));
+        System.out.printf("Starte Algorithmus mit %d Verbindungen und %d Stationen%n", this.connections.size(), this.stations.size());
+
+        getMinStationsRek(new HashSet<>(), serviceStations, remainingStations, remainingConnections);
+
         logger.stop(ConstantsLogging.MIN_STATIONS);
-        return res;
-    }
-
-    public HashSet<String> getMinStationsTS() {
-        reduceConnections();
-
-        // ordne allen Stationen die reduzierten Zugverbindungen zu
-        for (int i = 0; i < this.connections.size(); i++) {
-            for (String station : this.connections.get(i).getStations()) {
-                this.stations.get(station).addConnection(i);
-            }
-        }
-
-        reduceStations();
-
-        System.out.println(this.stations.size());
-        System.out.println(this.connections.size());
-
-        System.out.println(this.connections);
-        System.out.println(this.stations);
-
-        HashSet<String> serviceStations = new HashSet<>();
-        this.remainingStations = new HashSet<>(this.stations.keySet());
-        this.remainingConnections = new HashSet<>(IntStream.range(0, this.connections.size()).boxed().toList());
-
-        getMinStationsRek(new HashSet<>(), serviceStations);
+        System.out.printf("Ergebnis ermittelt: %d Stationen in %s%n", serviceStations.size(), serviceStations);
 
         return serviceStations;
     }
 
-    private HashSet<Bahnhof> removeConnection(int connection) {
-        HashSet<Bahnhof> ret = new HashSet<>();
-//        for (String station :
-//                ) {
-//
-//        }
+    private ArrayList<Bahnhof> copyAndRemoveStations(ArrayList<Bahnhof> stations, HashSet<Integer> removedConnections) {
+        ArrayList<Bahnhof> ret = new ArrayList<>();
+
+        for (int i = stations.size() - 1; i >= 0; i--) {
+            Bahnhof old = stations.get(i);
+            Bahnhof newStation = new Bahnhof(old.getName());
+            newStation.addConnections(old.getConnections());
+            newStation.removeConnections(removedConnections);
+            ret.add(newStation);
+        }
+        ret.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
         return ret;
     }
 
-    private HashSet<Integer> remainingConnections = new HashSet<>();
-    private HashSet<String> remainingStations = new HashSet<>();
+    private void getMinStationsRek(HashSet<String> current, HashSet<String> shortest, ArrayList<Bahnhof> remainingStations, HashSet<Integer> remainingConnections) {
 
-    public void getMinStationsRek(HashSet<String> current, HashSet<String> shortest) {
-
-        if (shortest.size() != 0 && current.size() >= shortest.size()) {                    // schlechter, als bisher beste Loesung
-            return;
-        }
-
-        if (this.remainingConnections.isEmpty()) {                                          // alle Verbindungen mit weniger Stationen abgedeckt
+        if (remainingConnections.isEmpty()) { // Loesung gefunden
             shortest.clear();
             shortest.addAll(current);
-            System.out.println("solution " + shortest);
+            logger.log("Zwischenergebnis: " + shortest);
             return;
         }
 
-        for (String station : remainingStations) {
+        for (Bahnhof station : remainingStations) {
+            String currentName = station.getName();
 
-            HashSet<Integer> originalConnections = new HashSet<>(remainingConnections);
-
-            remainingConnections.removeAll(this.stations.get(station).getConnections());
-
-            HashSet<String> originalStations = new HashSet<>(remainingStations);
-
-            remainingStations = new HashSet<>();
-            for (int cIndex : remainingConnections) {
-                remainingStations.addAll(this.connections.get(cIndex).getStations());
+            if (current.contains(station.getName())) {
+                continue;
             }
 
-            current.add(station);
-            getMinStationsRek(current, shortest);
-            remainingStations = originalStations;
-            remainingConnections = originalConnections;
-            current.remove(station);
+            // reichen die maximal verbleibenden Stationen nicht aus, um die uebrigen Verbindungen abzudecken,
+            // kann hier frueher beendet werden.
+            // Das kann mit der Verbindungszahl der aktuellen Station abgeschaetzt werden, da alle folgenden Stationen
+            // garantiert werniger Verbindungen haben.
 
+            int stepsTillSkip = shortest.size() - current.size();
+            if(shortest.size() != 0 && remainingConnections.size() >= stepsTillSkip * station.getConnectionCount()) {
+                return;
+            }
+
+            HashSet<Integer> removedConnections = new HashSet<>(this.stations.get(currentName).getConnections());
+            HashSet<Integer> originalConnections = new HashSet<>(remainingConnections);
+            remainingConnections.removeAll(removedConnections);                                 // entferne alle neu bekannten Verbindungen
+
+            ArrayList<Bahnhof> originalStations = new ArrayList<>(remainingStations);
+            remainingStations = copyAndRemoveStations(remainingStations, removedConnections);   // entferne die Verbindungen aus den Stationen und sortiere diese neu
+
+            current.add(currentName);
+            getMinStationsRek(current, shortest, remainingStations, remainingConnections);      // naechste Station
+            remainingStations = originalStations;                                               // originalwerte wiederherstellen
+            remainingConnections = originalConnections;
+            current.remove(currentName);
 
         }
-    }
-
-
-    private Map<String, Long> getCount(List<Zugverbindung> verbindungen) {
-        List<String> occurrences = new ArrayList<>();
-        verbindungen.forEach(verbindung -> occurrences.addAll(verbindung.getStations()));
-        return occurrences.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting()));
     }
 
     private void reduceStations() {
@@ -200,16 +160,6 @@ public class Streckennetz {
         logger.log(String.format("Zugverbindungen entfernt: (%d) %s", reducedConnections.size(), reducedConnections.size() > 0 ? reducedConnections : ""));
         logger.stop(ConstantsLogging.REDUCE_CONNECTIONS);
 
-    }
-
-    private List<Zugverbindung> testConnectAndReturnFaulty(List<Zugverbindung> vList, Set<String> stations) {
-        List<Zugverbindung> res = new ArrayList<>();
-        for (Zugverbindung v : vList) {
-            if (v.getStations().stream().noneMatch(stations::contains)) {
-                res.add(v);
-            }
-        }
-        return res;
     }
 
 }

@@ -11,13 +11,15 @@ import ioHandling.file.exceptions.FileReadException;
 import ioHandling.file.exceptions.FileWriteException;
 import ioHandling.logger.ConstantsLogging;
 import ioHandling.logger.Logger;
+import model.Zugverbindung;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * Startklasse des Programms TODO thema
+ * Startklasse des Programms zur Ermittlung minimaler Servicestationen in einem Netz aus Zugverbindugen.
  *
  * @author Mats Spoelgen
  */
@@ -34,9 +36,9 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/random_60_20.txt";
+        inputFilePath = "input/random_60_10.txt";
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
-        logger.setConsoleLogging(true);
+        logger.setConsoleLogging(true); // TODO remove
     }
 
     private static void initializeFileIO() throws FileFormatException, FileNotFoundException, FileReadException, FileWriteException, FileCreateException {
@@ -80,12 +82,11 @@ public class Main {
 
         HashSet<String> serivceStationen = new HashSet<>();
 
-        // Algorithmus ausfuehren
-//        serivceStationen = new Streckennetz(input.getData()).getMinStations();
-        serivceStationen = new Streckennetz(input.getData()).getMinStationsTS();
-
         try {
+            // Algorithmus ausfuehren
+            serivceStationen = input.getStreckennetz().getMinStations();
 
+            testResult(serivceStationen, input.getConnections());
         } catch (Exception e) {
             logger.error(e.getMessage());
         } finally {
@@ -93,6 +94,16 @@ public class Main {
         }
         logger.stop(ConstantsLogging.MAIN);
     }
-}
 
-//TODO keine Umlaute!!
+    private static void testResult(HashSet<String> servicestationen, ArrayList<Zugverbindung> verbindungen) {
+        int unvisited = 0;
+        for (Zugverbindung verbindung :
+                verbindungen) {
+            if (verbindung.getStations().stream().noneMatch(servicestationen::contains)) {
+                unvisited++;
+            }
+        }
+        System.out.println("Ergebnis getestet. Unbesuchte Verbindungen: " + unvisited);
+    }
+
+}

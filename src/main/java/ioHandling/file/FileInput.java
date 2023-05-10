@@ -4,6 +4,8 @@ import ioHandling.file.exceptions.FileFormatException;
 import ioHandling.file.exceptions.FileReadException;
 import ioHandling.InputHandler;
 import ioHandling.logger.Logger;
+import logic.Streckennetz;
+import model.Bahnhof;
 import model.Zugverbindung;
 
 import java.io.File;
@@ -18,26 +20,27 @@ import java.util.*;
 public class FileInput implements InputHandler {
 
     private final File file;
-    private ArrayList<Zugverbindung> verbindungen;
+    private final ArrayList<Zugverbindung> connections;
     private final Logger logger;
 
     /**
      * Erstellt einen neuen FileReader. Der Pfad der Eingabedatei wird uebergeben.
+     *
      * @param filePath Pfad der Eingabedatei
      * @throws FileNotFoundException falls die Datei nicht gefunden werden kann.
-     * @throws FileReadException falls ein Fehler beim Lesen der Datei auftritt.
-     * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
+     * @throws FileReadException     falls ein Fehler beim Lesen der Datei auftritt.
+     * @throws FileFormatException   falls die Datei ein ungueltiges Format hat.
      */
     public FileInput(String filePath) throws FileNotFoundException, FileReadException, FileFormatException {
         this.logger = Logger.getInstance();
         this.file = new File(filePath);
-        this.verbindungen = new ArrayList<>();
+        this.connections = new ArrayList<>();
 
-        if(!this.file.isFile()) {
+        if (!this.file.isFile()) {
             throw new FileNotFoundException(String.format("\"%s\" ist keine Datei oder wurde nicht gefunden.", this.file.getName()));
         }
 
-        if(!this.file.canRead()) {
+        if (!this.file.canRead()) {
             throw new FileReadException(String.format("Die Datei \"%s\" kann nicht gelesen werden.", this.file.getName()));
         }
 
@@ -46,39 +49,65 @@ public class FileInput implements InputHandler {
 
     /**
      * Liest die Eingabedatei ein und speichert die Zugverbindungen ab.
+     *
      * @throws FileNotFoundException falls ein Fehler beim Zugriff auf die Datei auftritt.
-     * @throws FileFormatException falls die Datei ein ungueltiges Format hat.
+     * @throws FileFormatException   falls die Datei ein ungueltiges Format hat.
      */
     private void read() throws FileNotFoundException, FileFormatException {
         Scanner scanner = new Scanner(this.file);
         logger.log("Einlesevorgang gestartet");
 
-        if(!scanner.hasNext()) {
+        if (!scanner.hasNext()) {
             throw new FileFormatException("Die Datei ist leer und damit ungueltig.");
         }
 
         String line;
         do {
             line = scanner.nextLine();
-            if(!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
-                Zugverbindung verbindung = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
-                if(verbindung.getStations().size() < 2) {
+            if (!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
+                Zugverbindung connection = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
+                if (connection.getStations().size() < 2) {
                     throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen");
                 }
-                this.verbindungen.add(verbindung);
+                this.connections.add(connection);
             }
         } while (scanner.hasNext());
 
-        if(this.verbindungen.size() == 0){
+        if (this.connections.size() == 0) {
             throw new FileFormatException("Die Datei enthaelt keine gueltigen Verbindungen");
         }
 
         scanner.close();
-        logger.log(String.format("Einlesevorgang abgeschlossen, %s Zugverbindung(en) eingelesen", this.verbindungen.size()));
+        logger.log(String.format("Einlesevorgang abgeschlossen, %s Zugverbindung(en) eingelesen", this.connections.size()));
     }
 
+    /**
+     * Gibt das Streckennetz aus, das aus der Eingabedatei erstellt wurde.
+     *
+     * @return Streckennetz
+     */
     @Override
-    public ArrayList<Zugverbindung> getData(){
-        return this.verbindungen;
+    public Streckennetz getStreckennetz() {
+        HashMap<String, Bahnhof> stations = new HashMap<>();
+        for (Zugverbindung connection : this.connections) {
+            for (String station : connection.getStations()) {
+                if (!stations.containsKey(station)) {
+                    stations.put(station, new Bahnhof(station));
+                }
+            }
+        }
+
+        return new Streckennetz(new ArrayList<>(this.connections), stations);
+    }
+
+    /**
+     * Gibt die Verbindungen des urspruenglichen Streckennetzes aus.
+     * Wird fuer das Testen des Ergebnisses verwendet.
+     *
+     * @return Verbindungen des Streckennetzes
+     */
+    @Override
+    public ArrayList<Zugverbindung> getConnections() {
+        return new ArrayList<>(this.connections);
     }
 }
