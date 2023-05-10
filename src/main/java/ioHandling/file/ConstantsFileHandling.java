@@ -33,7 +33,7 @@ public final class ConstantsFileHandling {
      */
     public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z0-9]+;)+[a-zA-Z0-9]*$";
 //    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z]+;)+[a-zA-Z]*$";
-//    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-ZÄÖÜäöüß]+;)+[a-zA-ZÄÖÜäöüß]*$";
+//    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-ZÄÖÜäöüß]+;)+[a-zA-ZÄÖÜäöüß]*$"; // TODO fix
 
     /**
      * Regulaerer Ausdruck, Trennsymbol der Stationen in der Eingabedatei.

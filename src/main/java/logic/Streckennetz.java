@@ -5,22 +5,37 @@ import ioHandling.logger.Logger;
 import model.Bahnhof;
 import model.Zugverbindung;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
+/**
+ * Klasse zur Berechnung minimaler Servicestationen.
+ *
+ * @author Mats Spoelgen
+ */
 public class Streckennetz {
 
     private final ArrayList<Zugverbindung> connections;
     private final HashMap<String, Bahnhof> stations;
     private final Logger logger;
 
+
+    /**
+     * Konstruktor
+     *
+     * @param connections Zugverbindungen mit Bahnhofskuerzeln
+     * @param stations    Bahnhoefe mit (leeren) Verbindungs-Indices
+     */
     public Streckennetz(ArrayList<Zugverbindung> connections, HashMap<String, Bahnhof> stations) {
         this.logger = Logger.getInstance();
         this.connections = connections;
         this.stations = stations;
     }
 
+    /**
+     * Reduziert Verbindungen, verknuepft Bahnhoefe mit reduzierten
+     * Verbindungen und reuziert anschliessend die Bahnhoafe
+     */
     public void reduce() {
         reduceConnections();
 
@@ -34,6 +49,11 @@ public class Streckennetz {
         reduceStations();
     }
 
+    /**
+     * Eintrittspunkt fuer rekursive Ermittlung einer minimalen Menge an ServiceStationen.
+     *
+     * @return minimale Servicestationen
+     */
     public HashSet<String> getMinStations() {
         HashSet<String> serviceStations = new HashSet<>();
 
@@ -56,6 +76,13 @@ public class Streckennetz {
         return serviceStations;
     }
 
+    /**
+     * Entfernt besuchte Verbindungen aus den Bahnhoefen, damit diese im fuer den naechsten Rekursionsschritt sortiert werden koennen.
+     *
+     * @param stations           besagte Bahnhoefe
+     * @param removedConnections zu entfernende Verbindungen
+     * @return Nach Anzahl neuer Verbindungen absteigend sortierte Bahnhoefe
+     */
     private ArrayList<Bahnhof> copyAndRemoveStations(ArrayList<Bahnhof> stations, HashSet<Integer> removedConnections) {
         ArrayList<Bahnhof> ret = new ArrayList<>();
 
@@ -70,6 +97,14 @@ public class Streckennetz {
         return ret;
     }
 
+    /**
+     * Ermittelt rekursiv die minimalen Servicestationen mit Backtracking.
+     *
+     * @param current              aktuelle Menge an Servicestationen
+     * @param shortest             bisher bestes Ergebnis, Menge an Servicestationen, die alle Verbindungen abdecken
+     * @param remainingStations    Verbleibende Bahnhoefe, die die unbekannten Verbindungen erreichen
+     * @param remainingConnections Verbleibende Verbindungen, die von den aktuellen Servicestationen nicht erreicht werden koennen
+     */
     private void getMinStationsRek(HashSet<String> current, HashSet<String> shortest, ArrayList<Bahnhof> remainingStations, HashSet<Integer> remainingConnections) {
 
         if (remainingConnections.isEmpty()) { // Loesung gefunden
@@ -92,7 +127,7 @@ public class Streckennetz {
             // garantiert werniger Verbindungen haben.
 
             int stepsTillSkip = shortest.size() - current.size();
-            if(shortest.size() != 0 && remainingConnections.size() >= stepsTillSkip * station.getConnectionCount()) {
+            if (shortest.size() != 0 && remainingConnections.size() >= stepsTillSkip * station.getConnectionCount()) {
                 return;
             }
 
@@ -112,6 +147,11 @@ public class Streckennetz {
         }
     }
 
+    /**
+     * Algorithmus nach Prinzip der Datenreduktionstechnik 2.
+     * Vergleich die Verbindungen aller Bahnhoefe. Deckt ein Bahnhof die Verbindungen
+     * eines anderen Bahnhofs ab, kann letzterer entfernt werden.
+     */
     private void reduceStations() {
         HashSet<String> reducedStations = new HashSet<>();
 
@@ -142,6 +182,11 @@ public class Streckennetz {
         logger.stop(ConstantsLogging.REDUCE_STATIONS);
     }
 
+    /**
+     * Algorithmus nach Prinzip der Datenreduktionstechnik 3.
+     * Vergleicht die Bahnhoefe aller Verbindungen. Haelt eine Verbindunge an allen Bahnhoefen,
+     * an denen auch schon eine weitere Verbindung haelt, kann sie entfernt werden.
+     */
     protected void reduceConnections() {
         List<Zugverbindung> reducedConnections = new ArrayList<>();
         logger.start(ConstantsLogging.REDUCE_CONNECTIONS);
