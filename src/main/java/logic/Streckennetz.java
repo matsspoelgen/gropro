@@ -34,7 +34,7 @@ public class Streckennetz {
 
     /**
      * Reduziert Verbindungen, verknuepft Bahnhoefe mit reduzierten
-     * Verbindungen und reuziert anschliessend die Bahnhoafe
+     * Verbindungen und reduziert anschliessend die Bahnhoafe
      */
     public void reduce() {
         reduceConnections();
