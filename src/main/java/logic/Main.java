@@ -34,7 +34,7 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/random_60_80.txt";
+        inputFilePath = "input/random_60_20.txt";
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true);
     }

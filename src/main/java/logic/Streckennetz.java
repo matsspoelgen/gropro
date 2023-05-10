@@ -92,17 +92,22 @@ public class Streckennetz {
         this.remainingStations = new HashSet<>(this.stations.keySet());
         this.remainingConnections = new HashSet<>(IntStream.range(0, this.connections.size()).boxed().toList());
 
-        this.sortedStations = new ArrayList<>(this.stations.values());
-        this.sortedStations.sort(Comparator.comparingInt(a -> -a.getConnections().size()));
-
         getMinStationsRek(new HashSet<>(), serviceStations);
 
         return serviceStations;
     }
 
+    private HashSet<Bahnhof> removeConnection(int connection) {
+        HashSet<Bahnhof> ret = new HashSet<>();
+//        for (String station :
+//                ) {
+//
+//        }
+        return ret;
+    }
+
     private HashSet<Integer> remainingConnections = new HashSet<>();
     private HashSet<String> remainingStations = new HashSet<>();
-    private ArrayList<Bahnhof> sortedStations;
 
     public void getMinStationsRek(HashSet<String> current, HashSet<String> shortest) {
 
@@ -117,43 +122,24 @@ public class Streckennetz {
             return;
         }
 
-        for (Bahnhof station : sortedStations) {
-            String currentName = station.getName();
+        for (String station : remainingStations) {
 
-            if (!remainingStations.contains(currentName)) {
-                continue;
-            }
+            HashSet<Integer> originalConnections = new HashSet<>(remainingConnections);
 
-//            System.out.println(currentName);
-//            System.out.println(remainingConnections + " remaining");
-//            System.out.println(remainingStations + " remaining");
-
-            HashSet<Integer> commonConnections = new HashSet<>(remainingConnections);
-            commonConnections.retainAll(this.stations.get(currentName).getConnections());
-
-//            System.out.println(commonConnections + " common");
-//            System.out.println(current + " current");
-
-            remainingConnections.removeAll(commonConnections);                            // hake alle Verbindungen ab, die durch die aktuelle Station erreichbar sind
+            remainingConnections.removeAll(this.stations.get(station).getConnections());
 
             HashSet<String> originalStations = new HashSet<>(remainingStations);
 
-            HashSet<String> reachableStations = new HashSet<>();            // bestimme die Stationen, die durch die unbekannten Verbindungen erreicht werden koennen
-            for (int cIndex : remainingConnections) {                                       // aus den unbekannten Verbindungen
-                reachableStations.addAll(this.connections.get(cIndex).getStations());     // behalte nur die Stationen, die nicht erreichbar sind
+            remainingStations = new HashSet<>();
+            for (int cIndex : remainingConnections) {
+                remainingStations.addAll(this.connections.get(cIndex).getStations());
             }
 
-            // entferne die nicht erreichbaren
-            remainingStations = reachableStations;
-
-            current.add(currentName);                                                       // fuege aktuelle Station als moegliche Servicestation ein
+            current.add(station);
             getMinStationsRek(current, shortest);
-            remainingStations = originalStations;                       // Ausschluss der Stationen und Verbindungen rueckgaengig machen
-            remainingConnections.addAll(commonConnections);
-            current.remove(currentName);
-
-            // bestimme max bahnhof, der von verbleibenden Verbindungen erreicht wird
-            // bestimme Verbindungen, die von aktueller loesung nicht erreicht werden
+            remainingStations = originalStations;
+            remainingConnections = originalConnections;
+            current.remove(station);
 
 
         }
