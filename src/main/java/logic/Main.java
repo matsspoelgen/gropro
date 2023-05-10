@@ -34,7 +34,7 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/random_60_100.txt";
+        inputFilePath = "input/random_60_80.txt";
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
         logger.setConsoleLogging(true);
     }
@@ -81,7 +81,8 @@ public class Main {
         HashSet<String> serivceStationen = new HashSet<>();
 
         // Algorithmus ausfuehren
-        serivceStationen = new Streckennetz(input.getData()).getMinStations();
+//        serivceStationen = new Streckennetz(input.getData()).getMinStations();
+        serivceStationen = new Streckennetz(input.getData()).getMinStationsTS();
 
         try {
 

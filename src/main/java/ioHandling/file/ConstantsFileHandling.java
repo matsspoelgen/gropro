@@ -31,7 +31,9 @@ public final class ConstantsFileHandling {
      * Regulaerer Ausdruck, der testet, ob eine Eingabezeile ausschließlich
      * aus mindestens 2 Buchstabenfolgen, getrennt durch Semikolons besteht.
      */
-    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z]+;)+[a-zA-Z]*$";
+    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z0-9]+;)+[a-zA-Z0-9]*$";
+//    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-Z]+;)+[a-zA-Z]*$";
+//    public final static String LINE_VALIDATION_REGEX = "^(?:[a-zA-ZÄÖÜäöüß]+;)+[a-zA-ZÄÖÜäöüß]*$";
 
     /**
      * Regulaerer Ausdruck, Trennsymbol der Stationen in der Eingabedatei.
