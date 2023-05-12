@@ -68,10 +68,9 @@ public class FileInput implements InputHandler {
             line = scanner.nextLine();
             if (!line.startsWith(ConstantsFileHandling.COMMENT_PREFIX) && line.matches(ConstantsFileHandling.LINE_VALIDATION_REGEX)) {
                 Zugverbindung connection = new Zugverbindung(line.split(ConstantsFileHandling.STATION_SEPARATOR));
-                if (connection.getStations().size() < 2) {
-                    throw new FileFormatException("Eine Verbindung muss mindestens aus zwei unterschiedlichen Stationen bestehen"); //TODO kein error...
+                if (connection.getStations().size() > 1) {
+                    this.connections.add(connection);
                 }
-                this.connections.add(connection);
             }
         } while (scanner.hasNext());
 
