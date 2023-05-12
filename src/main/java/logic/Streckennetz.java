@@ -97,7 +97,6 @@ public class Streckennetz {
             newStation.removeConnections(removedConnections);
             ret.add(newStation);
         }
-        ret.sort(Comparator.comparingInt(a -> -a.getConnectionCount())); //TODO nach vorne in rek?
         return ret;
     }
 
@@ -117,6 +116,8 @@ public class Streckennetz {
             logger.log(String.format("Zwischenergebnis: %d Stationen %s", shortest.size(), shortest));
             return;
         }
+
+        sortedStations.sort(Comparator.comparingInt(a -> -a.getConnectionCount()));
 
         for (Bahnhof station : sortedStations) {
             String currentName = station.getName();

@@ -36,7 +36,7 @@ public class Main {
 //            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
 //        }
 //        inputFilePath = args[0];
-        inputFilePath = "input/test1.txt";
+        inputFilePath = "input/test3.txt";
         logger.log("Dateiname eingelesen: " + inputFilePath);
         logger.log("Logging parameter eingelesen: true");
         logger.log("Logging in Konsole aktiviert.");
