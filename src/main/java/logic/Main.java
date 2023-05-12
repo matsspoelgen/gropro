@@ -28,20 +28,14 @@ public class Main {
     private static final Logger logger = Logger.getInstance();
     private static InputHandler input;
     private static OutputHandler output;
-    private static String inputFilePath;
-    private static String errorFilePath;
+    private static  String inputFilePath;
 
     private static void parseFileArgs(String[] args) {
-//        if (args == null || args.length == 0) {
-//            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
-//        }
-//        inputFilePath = args[0];
-        inputFilePath = "input/test3.txt";
-        logger.log("Dateiname eingelesen: " + inputFilePath);
-        logger.log("Logging parameter eingelesen: true");
-        logger.log("Logging in Konsole aktiviert.");
+        if (args == null || args.length == 0) {
+            throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
+        }
+        inputFilePath = args[0];
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
-        logger.setConsoleLogging(true); // TODO remove
     }
 
     private static void initializeFileIO() throws FileFormatException, FileNotFoundException, FileReadException, FileWriteException, FileCreateException {
@@ -49,7 +43,7 @@ public class Main {
 
         String inputFileName = new File(inputFilePath).getName();
         String outPutFilePath = ConstantsFileHandling.OUTPUT_PATH + inputFileName + ConstantsFileHandling.OUTPUT_EXTENSION;
-        errorFilePath = ConstantsFileHandling.OUTPUT_PATH + inputFileName + ConstantsFileHandling.ERROR_EXTENSION;
+        String errorFilePath = ConstantsFileHandling.OUTPUT_PATH + inputFileName + ConstantsFileHandling.ERROR_EXTENSION;
 
         logger.log("Erstelle FileInput auf Eingabedatei \"" + inputFilePath + "\"");
         logger.log("Erstelle FileOutput mit Ausgabepfad \"" + outPutFilePath + "\"");
@@ -59,7 +53,6 @@ public class Main {
 
     private static void outputResult(HashSet<String> serviceStationen) {
         try {
-            output.error(logger.getMessages());
             if (logger.hasErrors()) {
                 System.out.println("Bei der Verarbeitung sind Fehler aufgetreten.");
                 output.error(logger.getMessages());

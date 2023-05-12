@@ -60,8 +60,11 @@ public class Bahnhof {
         this.connections.removeAll(connections);
     }
 
-    // TODO besser
-    public void addConnections(HashSet<Integer> connections) {
+    /**
+     * Fuegt eine Menge neuer Verbindungen hinzu
+     * @param connections Indices der Verbindungen
+     */
+    public void addAllConnections(HashSet<Integer> connections) {
         this.connections.addAll(connections);
     }
 
