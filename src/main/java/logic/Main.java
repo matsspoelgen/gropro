@@ -35,6 +35,7 @@ public class Main {
             throw new IllegalArgumentException("Der Dateiname wurde nicht als Parameter uebergeben.");
         }
         inputFilePath = args[0];
+
         logger.setConsoleLogging((args.length > 1) && args[1].equals("true"));
     }
 
